@@ -1,0 +1,10 @@
+{
+  "network": "baseSepolia",
+  "deployedAt": "2026-03-14T18:08:05.986Z",
+  "deployer": "0xf3E0C8078Dd02cF297e3d030354d12779150e0E5",
+  "contracts": {
+    "AgentRegistry": "0xcd454b704FED5744893874D70DE1A3F3C0858407",
+    "ReceiptRegistry": "0x7FbC5257a73b51Fd01859cd50C7A1eAA5E476EA1",
+    "ReputationEngine": "0x82A335CC0a1F6c7636F9ab47c5C55c7c53684737"
+  }
+}

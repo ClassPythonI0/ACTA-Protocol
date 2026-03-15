@@ -1,0 +1,38 @@
+# ── Secrets (NEVER commit these) ─────────────────────────────
+.env
+.env.local
+.env.*.local
+contracts/.env
+.acta_credentials
+
+# ── Python ────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# ── Agent runtime cache ───────────────────────────────────────
+agent/agent_ids.json
+
+# ── Node / Hardhat ────────────────────────────────────────────
+node_modules/
+contracts/node_modules/
+frontend/node_modules/
+contracts/cache/
+contracts/artifacts/
+contracts/broadcast/
+
+# ── Next.js ───────────────────────────────────────────────────
+frontend/.next/
+frontend/out/
+frontend/.vercel/
+frontend/tsconfig.tsbuildinfo
+
+# ── Misc ──────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.log
