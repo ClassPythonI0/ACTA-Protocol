@@ -1,15 +1,14 @@
 import { publicClient } from "@/lib/client";
+import { resolveEns, resolveEnsMany } from "@/lib/ens";
 import {
   CONTRACTS,
   AGENT_REGISTRY_ABI,
   REPUTATION_ENGINE_ABI,
 } from "@/lib/contracts";
 
-// The deployer wallet that registered all agents
 const DEPLOYER = "0xf3E0C8078Dd02cF297e3d030354d12779150e0E5";
 
 async function getAgents() {
-  // Use getAgentsByOwner — no block range limit, no getLogs needed
   const agentIds = await publicClient.readContract({
     address: CONTRACTS.AgentRegistry,
     abi: AGENT_REGISTRY_ABI,
@@ -61,6 +60,15 @@ export const revalidate = 60;
 export default async function RegistryPage() {
   const agents = await getAgents();
 
+  // Resolve ENS for the operator wallet
+  const operatorEns = await resolveEns(DEPLOYER);
+
+  // Collect all owner addresses and resolve in parallel
+  const ownerAddresses = agents
+    .filter(Boolean)
+    .map((item) => (item!.agent as { owner: string }).owner);
+  const ensMap = await resolveEnsMany(ownerAddresses);
+
   return (
     <div className="space-y-8">
       <div>
@@ -68,6 +76,36 @@ export default async function RegistryPage() {
         <p className="text-sm text-gray-500">
           All AI agents registered on ACTA Protocol — Pillar 1: Identity
         </p>
+      </div>
+
+      {/* Operator identity card with ENS */}
+      <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 flex items-center gap-4">
+        {operatorEns.avatar && (
+          <img
+            src={operatorEns.avatar}
+            alt={operatorEns.displayName}
+            className="w-10 h-10 rounded-full border border-white/10"
+          />
+        )}
+        {!operatorEns.avatar && (
+          <div className="w-10 h-10 rounded-full bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 text-xs font-mono">
+            OP
+          </div>
+        )}
+        <div>
+          <div className="text-sm font-semibold text-white">
+            {operatorEns.name ? (
+              <>
+                <span className="text-indigo-400">{operatorEns.name}</span>
+                <span className="ml-2 text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">ENS</span>
+              </>
+            ) : (
+              <span className="font-mono text-gray-400">{shortHex(DEPLOYER)}</span>
+            )}
+          </div>
+          <div className="text-xs text-gray-600 font-mono mt-0.5">{DEPLOYER}</div>
+          <div className="text-[10px] text-gray-700 mt-0.5">Operator — registered all agents</div>
+        </div>
       </div>
 
       <div className="flex items-center gap-3 text-xs text-gray-600">
@@ -112,6 +150,8 @@ export default async function RegistryPage() {
               exists: boolean;
             } | null;
 
+            const ownerEns = ensMap[a.owner];
+
             return (
               <div key={i} className="rounded-xl border border-white/5 bg-white/[0.02] p-5 hover:border-indigo-500/20 transition-colors">
                 <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -150,8 +190,16 @@ export default async function RegistryPage() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-indigo-400 hover:text-indigo-300"
+                      title={a.owner}
                     >
-                      {shortHex(a.owner)}
+                      {ownerEns?.name ? (
+                        <>
+                          <span className="text-emerald-400">{ownerEns.name}</span>
+                          <span className="ml-1 text-[9px] opacity-50">ENS</span>
+                        </>
+                      ) : (
+                        shortHex(a.owner)
+                      )}
                     </a>
                   </div>
                   <div>
