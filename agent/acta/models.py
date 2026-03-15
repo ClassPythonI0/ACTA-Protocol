@@ -6,6 +6,7 @@ from enum import Enum
 class ActionType(str, Enum):
     DELEGATE = "delegate"
     API_CALL = "api_call"
+    PAYMENT = "payment"
     DECISION = "decision"
     OUTPUT = "output"
     VERIFY = "verify"
