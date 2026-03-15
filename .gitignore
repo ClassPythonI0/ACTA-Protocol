@@ -32,6 +32,13 @@ frontend/out/
 frontend/.vercel/
 frontend/tsconfig.tsbuildinfo
 
+# ── Internal docs (strategy, working notes — not for public) ──
+ACTA_PROTOCOL.md
+BUILD_JOURNAL.md
+Track requirements
+Track requirements.md
+docs/
+
 # ── Misc ──────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
