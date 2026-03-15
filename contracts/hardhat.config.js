@@ -27,6 +27,12 @@ module.exports = {
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       chainId: 8453,
     },
+    statusSepolia: {
+      url: "https://public.sepolia.rpc.status.network",
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      chainId: 1660990954,
+      gasPrice: 0,
+    },
   },
   etherscan: {
     apiKey: {

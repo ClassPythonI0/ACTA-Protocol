@@ -1,0 +1,18 @@
+{
+  "network": "statusSepolia",
+  "chainId": 1660990954,
+  "deployedAt": "2026-03-15T14:42:22.167Z",
+  "deployer": "0xf3E0C8078Dd02cF297e3d030354d12779150e0E5",
+  "gasPrice": 0,
+  "contracts": {
+    "AgentRegistry": "0x910EF6BC7d8d1431968A6E6f0E8db0cB614A6998",
+    "ReceiptRegistry": "0x434B0f694845331E1a4Ca41903ee76Fa89632be3",
+    "ReputationEngine": "0x97923CEc0BD68303F63BAe46337eE3E1Ed23825f"
+  },
+  "proof": {
+    "description": "Gasless proof-of-concept receipt issued at deployment",
+    "tx_hash": "0xa912c3ec7cfced5eb45298f9ea4f8f5a6580b43673320f3dfe5e2a800662ac46",
+    "gas_used": "320665",
+    "gas_cost_eth": "0"
+  }
+}
