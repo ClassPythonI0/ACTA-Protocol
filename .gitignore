@@ -17,6 +17,7 @@ build/
 
 # ── Agent runtime cache ───────────────────────────────────────
 agent/agent_ids.json
+agent/agent_log.json
 
 # ── Node / Hardhat ────────────────────────────────────────────
 node_modules/

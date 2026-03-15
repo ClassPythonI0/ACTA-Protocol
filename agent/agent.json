@@ -1,0 +1,174 @@
+{
+  "schema_version": "erc-8004-v1",
+  "name": "ACTA Protocol — Multi-Agent Trust System",
+  "version": "1.0.0",
+  "description": "A four-pillar trust infrastructure for autonomous AI agents on Ethereum. ACTA issues cryptographic receipts for every agent action, maintains permanent on-chain reputation scores, and provides verifiable identity anchored to ERC-8004 registries. The system autonomously discovers goals, plans execution, produces outputs, self-verifies, and submits on-chain proof of every step.",
+
+  "operator": {
+    "wallet": "0xf3E0C8078Dd02cF297e3d030354d12779150e0E5",
+    "chain": "base-sepolia",
+    "chain_id": 84532
+  },
+
+  "erc8004": {
+    "registry_contract": "0xcd454b704FED5744893874D70DE1A3F3C0858407",
+    "reputation_contract": "0x82A335CC0a1F6c7636F9ab47c5C55c7c53684737",
+    "audit_contract": "0x7FbC5257a73b51Fd01859cd50C7A1eAA5E476EA1",
+    "agents": {
+      "OrchestratorAgent": {
+        "agent_id": "0xc011df5fe6bfd4c3c6b1e16f70d7d145d5bda359865a805d07bccab6522a4a9f",
+        "role": "orchestrator",
+        "capabilities": ["orchestrate", "delegate", "plan", "decompose"],
+        "registration_tx": "see AgentRegistry on Basescan"
+      },
+      "ResearchAgent": {
+        "agent_id": "0x422c8aa4985925cb2fe5eed40148ab738bd344f3d0ceaa8da6d214011341191d",
+        "role": "researcher",
+        "capabilities": ["research", "retrieve", "summarize", "analyze"],
+        "registration_tx": "see AgentRegistry on Basescan"
+      },
+      "WriterAgent": {
+        "agent_id": "0xafacbb26d49d27475e141fd2f04fa8bc9b77ae1e1445ce1051640d722d0b7020",
+        "role": "writer",
+        "capabilities": ["write", "structure", "compose", "synthesize"],
+        "registration_tx": "see AgentRegistry on Basescan"
+      },
+      "VerifierAgent": {
+        "agent_id": "0xcd8e60df24c7f23c9aef5d5ec5315cf5e9652a2d43dc6a49bfad86be11069e47",
+        "role": "verifier",
+        "capabilities": ["verify", "validate", "audit", "fact-check"],
+        "registration_tx": "see AgentRegistry on Basescan"
+      }
+    }
+  },
+
+  "pipeline": {
+    "type": "sequential-multi-agent",
+    "decision_loop": ["discover", "plan", "execute", "verify", "submit"],
+    "stages": [
+      {
+        "stage": 1,
+        "agent": "OrchestratorAgent",
+        "action": "DECISION",
+        "description": "Decomposes human goal into research topic and writing goal"
+      },
+      {
+        "stage": 2,
+        "agent": "ResearchAgent",
+        "action": "OUTPUT",
+        "description": "Deep research on the assigned topic"
+      },
+      {
+        "stage": 3,
+        "agent": "WriterAgent",
+        "action": "OUTPUT",
+        "description": "Structured report from research output"
+      },
+      {
+        "stage": 4,
+        "agent": "VerifierAgent",
+        "action": "VERIFICATION",
+        "description": "Fact-checks writer output against research. Emits PASS or FAIL."
+      }
+    ],
+    "on_chain_actions": [
+      "Agent identity registration (AgentRegistry)",
+      "Reputation initialization (ReputationEngine)",
+      "Receipt issuance per action (ReceiptRegistry)",
+      "Reputation update after verification (ReputationEngine)"
+    ]
+  },
+
+  "tools": [
+    {
+      "name": "anthropic_claude",
+      "type": "llm",
+      "model": "claude-opus-4-6",
+      "features": ["adaptive_thinking", "extended_context"],
+      "max_tokens": 8192
+    },
+    {
+      "name": "acta_receipt_registry",
+      "type": "blockchain_write",
+      "contract": "0x7FbC5257a73b51Fd01859cd50C7A1eAA5E476EA1",
+      "network": "base-sepolia",
+      "function": "issueReceipt"
+    },
+    {
+      "name": "acta_reputation_engine",
+      "type": "blockchain_write",
+      "contract": "0x82A335CC0a1F6c7636F9ab47c5C55c7c53684737",
+      "network": "base-sepolia",
+      "function": "recordOutcome"
+    },
+    {
+      "name": "acta_agent_registry",
+      "type": "blockchain_write",
+      "contract": "0xcd454b704FED5744893874D70DE1A3F3C0858407",
+      "network": "base-sepolia",
+      "function": "registerAgent"
+    },
+    {
+      "name": "sha256_hasher",
+      "type": "crypto",
+      "description": "SHA256 hashing of all agent inputs and outputs before on-chain submission"
+    }
+  ],
+
+  "tech_stack": {
+    "runtime": "Python 3.14",
+    "llm_sdk": "anthropic>=0.40.0",
+    "blockchain": "web3>=7.0.0",
+    "identity": "eth-account>=0.12.0",
+    "validation": "pydantic>=2.0.0",
+    "network_primary": "Base Sepolia (chain_id: 84532)",
+    "network_secondary": "Status Network Sepolia (chain_id: 1660990954)",
+    "frontend": "Next.js 16 + Tailwind CSS + viem",
+    "deployment": "Vercel"
+  },
+
+  "compute": {
+    "max_tokens_per_agent_call": 8192,
+    "max_agents_per_pipeline": 4,
+    "max_on_chain_txs_per_run": 12,
+    "timeout_per_agent_seconds": 120,
+    "gas_limit_per_tx": 300000,
+    "gas_price_multiplier": 1.2,
+    "self_correction": true,
+    "retry_on_chain_failure": false,
+    "abort_on_verification_failure": false
+  },
+
+  "safety": {
+    "guardrails": [
+      "Verifier agent independently checks all Writer outputs against Research sources",
+      "On-chain failure logs to stderr but does not abort pipeline — partial receipts are acceptable",
+      "All inputs and outputs are hashed before submission — raw content never sent to chain",
+      "Private key managed via environment variable, never hardcoded",
+      "Gas price capped at 1.2x market rate to prevent runaway fees"
+    ],
+    "irreversible_action_checks": [
+      "Transaction parameters validated before signing",
+      "Nonce managed at instance level to prevent double-spend",
+      "Chain connection verified before any transaction attempt"
+    ]
+  },
+
+  "task_categories": [
+    "trust-infrastructure",
+    "agent-identity",
+    "on-chain-reputation",
+    "audit-trail",
+    "multi-agent-coordination",
+    "ethereum-infrastructure",
+    "ai-agent-tooling"
+  ],
+
+  "links": {
+    "github": "https://github.com/ClassPythonI0/ACTA-Protocol",
+    "frontend": "https://synthesis-tan.vercel.app",
+    "basescan_registry": "https://sepolia.basescan.org/address/0xcd454b704FED5744893874D70DE1A3F3C0858407",
+    "basescan_receipts": "https://sepolia.basescan.org/address/0x7FbC5257a73b51Fd01859cd50C7A1eAA5E476EA1",
+    "basescan_reputation": "https://sepolia.basescan.org/address/0x82A335CC0a1F6c7636F9ab47c5C55c7c53684737"
+  }
+}
